@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math"
+	"os"
 	"time"
 
 	"math/rand"
@@ -47,7 +49,7 @@ func (s *Server) GetStockPriceServerStreaming(request *pb.StockRequest, stream p
 		return status.Error(codes.Canceled, "insufficient timeout")
 	}
 
-	for ctx.Err() == nil && interations < max && time.Now().Before(deadline) {
+	for ctx.Done() == nil && interations < max && time.Now().Before(deadline) {
 		value := RandomFloat64Between(50.0, 300.0)
 
 		log.Printf("Enviando preço de ação para %s: {R$ %.2f} \n", request.Symbol, value)
@@ -66,4 +68,73 @@ func (s *Server) GetStockPriceServerStreaming(request *pb.StockRequest, stream p
 	log.Printf("Cliente desconectado: %v \n", ctx.Err())
 
 	return ctx.Err()
+}
+
+func (s *Server) UpdateStockPriceClientStreaming(stream pb.StockPrice_UpdateStockPriceClientStreamingServer) error {
+
+	ctx := stream.Context()
+
+	prices := make(map[string]float64)
+
+	batchSize := 2
+
+	count := 0
+
+	for ctx.Err() == nil {
+		stock, err := stream.Recv()
+		if err != nil {
+			return err
+		}
+
+		log.Printf("Recebendo preço de ação para %s: {R$ %.2f} \n", stock.Symbol, stock.Price)
+
+		prices[stock.Symbol] = stock.Price
+
+		count++
+
+		if count%batchSize == 0 {
+			file, err := os.OpenFile("prices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				return err
+			}
+			log.Printf("Salvando preços de ações no arquivo: %s", file.Name())
+
+			for symbol, price := range prices {
+				_, err := file.WriteString(fmt.Sprintf("%s: %.2f\n", symbol, price))
+				if err != nil {
+					file.Close()
+					return err
+				}
+			}
+
+			if err := file.Close(); err != nil {
+				return err
+			}
+
+			prices = make(map[string]float64)
+			count = 0
+		}
+	}
+
+	file, err := os.OpenFile("prices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	log.Printf("Salvando preços de ações no arquivo: %s", file.Name())
+
+	for symbol, price := range prices {
+		_, err := file.WriteString(fmt.Sprintf("%s: %.2f\n", symbol, price))
+		if err != nil {
+			file.Close()
+			return err
+		}
+	}
+
+	if err := file.Close(); err != nil {
+		return err
+	}
+
+	return stream.SendAndClose(&pb.UpdateStockPriceResponse{
+		Message: "Preços de ações atualizados",
+	})
 }
