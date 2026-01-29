@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"os"
@@ -19,6 +20,24 @@ func RandomFloat64Between(min, max float64) float64 {
 	value := min + rand.Float64()*(max-min)
 
 	return math.Round(value*100) / 100
+}
+
+func savePrices(prices map[string]float64) error {
+	file, err := os.OpenFile("prices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	log.Printf("Salvando %d preços no arquivo: %s", len(prices), file.Name())
+
+	for symbol, price := range prices {
+		if _, err := file.WriteString(fmt.Sprintf("%s: %.2f\n", symbol, price)); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *Server) GetStockPrice(ctx context.Context, request *pb.StockRequest) (*pb.StockResponse, error) {
@@ -82,58 +101,37 @@ func (s *Server) UpdateStockPriceClientStreaming(stream pb.StockPrice_UpdateStoc
 
 	for ctx.Err() == nil {
 		stock, err := stream.Recv()
+
+		if err == io.EOF {
+			log.Printf("Cliente finalizou a conexão %v \n", ctx.Err())
+			break
+		}
+
 		if err != nil {
 			return err
 		}
 
 		log.Printf("Recebendo preço de ação para %s: {R$ %.2f} \n", stock.Symbol, stock.Price)
-
 		prices[stock.Symbol] = stock.Price
-
 		count++
 
 		if count%batchSize == 0 {
-			file, err := os.OpenFile("prices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
+			if err := savePrices(prices); err != nil {
 				return err
 			}
-			log.Printf("Salvando preços de ações no arquivo: %s", file.Name())
-
-			for symbol, price := range prices {
-				_, err := file.WriteString(fmt.Sprintf("%s: %.2f\n", symbol, price))
-				if err != nil {
-					file.Close()
-					return err
-				}
-			}
-
-			if err := file.Close(); err != nil {
-				return err
-			}
-
 			prices = make(map[string]float64)
 			count = 0
 		}
 	}
 
-	file, err := os.OpenFile("prices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	log.Printf("Salvando preços de ações no arquivo: %s", file.Name())
-
-	for symbol, price := range prices {
-		_, err := file.WriteString(fmt.Sprintf("%s: %.2f\n", symbol, price))
-		if err != nil {
-			file.Close()
+	if len(prices) > 0 {
+		log.Println("Salvando dados restantes...")
+		if err := savePrices(prices); err != nil {
 			return err
 		}
 	}
 
-	if err := file.Close(); err != nil {
-		return err
-	}
-
+	log.Println("Streaming finalizado com sucesso")
 	return stream.SendAndClose(&pb.UpdateStockPriceResponse{
 		Message: "Preços de ações atualizados",
 	})
