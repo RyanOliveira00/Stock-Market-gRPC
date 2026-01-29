@@ -66,10 +66,14 @@ func (x *StockRequest) GetSymbol() string {
 }
 
 type StockResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	Price         float64                `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Symbol string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	Price  float64                `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`
+	// Types that are valid to be assigned to Time:
+	//
+	//	*StockResponse_Timestamp
+	//	*StockResponse_Datetime
+	Time          isStockResponse_Time `protobuf_oneof:"time"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -118,12 +122,46 @@ func (x *StockResponse) GetPrice() float64 {
 	return 0
 }
 
+func (x *StockResponse) GetTime() isStockResponse_Time {
+	if x != nil {
+		return x.Time
+	}
+	return nil
+}
+
 func (x *StockResponse) GetTimestamp() int64 {
 	if x != nil {
-		return x.Timestamp
+		if x, ok := x.Time.(*StockResponse_Timestamp); ok {
+			return x.Timestamp
+		}
 	}
 	return 0
 }
+
+func (x *StockResponse) GetDatetime() string {
+	if x != nil {
+		if x, ok := x.Time.(*StockResponse_Datetime); ok {
+			return x.Datetime
+		}
+	}
+	return ""
+}
+
+type isStockResponse_Time interface {
+	isStockResponse_Time()
+}
+
+type StockResponse_Timestamp struct {
+	Timestamp int64 `protobuf:"varint,3,opt,name=timestamp,proto3,oneof"`
+}
+
+type StockResponse_Datetime struct {
+	Datetime string `protobuf:"bytes,4,opt,name=datetime,proto3,oneof"`
+}
+
+func (*StockResponse_Timestamp) isStockResponse_Time() {}
+
+func (*StockResponse_Datetime) isStockResponse_Time() {}
 
 var File_proto_stock_market_proto protoreflect.FileDescriptor
 
@@ -131,14 +169,17 @@ const file_proto_stock_market_proto_rawDesc = "" +
 	"\n" +
 	"\x18proto/stock_market.proto\x12\fstock_market\"&\n" +
 	"\fStockRequest\x12\x16\n" +
-	"\x06symbol\x18\x01 \x01(\tR\x06symbol\"[\n" +
+	"\x06symbol\x18\x01 \x01(\tR\x06symbol\"\x83\x01\n" +
 	"\rStockResponse\x12\x16\n" +
 	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12\x14\n" +
-	"\x05price\x18\x02 \x01(\x01R\x05price\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp2X\n" +
+	"\x05price\x18\x02 \x01(\x01R\x05price\x12\x1e\n" +
+	"\ttimestamp\x18\x03 \x01(\x03H\x00R\ttimestamp\x12\x1c\n" +
+	"\bdatetime\x18\x04 \x01(\tH\x00R\bdatetimeB\x06\n" +
+	"\x04time2\xb5\x01\n" +
 	"\n" +
 	"StockPrice\x12J\n" +
-	"\rGetStockPrice\x12\x1a.stock_market.StockRequest\x1a\x1b.stock_market.StockResponse\"\x00B\x1bZ\x19stock-market-server/protob\x06proto3"
+	"\rGetStockPrice\x12\x1a.stock_market.StockRequest\x1a\x1b.stock_market.StockResponse\"\x00\x12[\n" +
+	"\x1cGetStockPriceServerStreaming\x12\x1a.stock_market.StockRequest\x1a\x1b.stock_market.StockResponse\"\x000\x01B\x1bZ\x19stock-market-server/protob\x06proto3"
 
 var (
 	file_proto_stock_market_proto_rawDescOnce sync.Once
@@ -159,9 +200,11 @@ var file_proto_stock_market_proto_goTypes = []any{
 }
 var file_proto_stock_market_proto_depIdxs = []int32{
 	0, // 0: stock_market.StockPrice.GetStockPrice:input_type -> stock_market.StockRequest
-	1, // 1: stock_market.StockPrice.GetStockPrice:output_type -> stock_market.StockResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: stock_market.StockPrice.GetStockPriceServerStreaming:input_type -> stock_market.StockRequest
+	1, // 2: stock_market.StockPrice.GetStockPrice:output_type -> stock_market.StockResponse
+	1, // 3: stock_market.StockPrice.GetStockPriceServerStreaming:output_type -> stock_market.StockResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -171,6 +214,10 @@ func init() { file_proto_stock_market_proto_init() }
 func file_proto_stock_market_proto_init() {
 	if File_proto_stock_market_proto != nil {
 		return
+	}
+	file_proto_stock_market_proto_msgTypes[1].OneofWrappers = []any{
+		(*StockResponse_Timestamp)(nil),
+		(*StockResponse_Datetime)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
