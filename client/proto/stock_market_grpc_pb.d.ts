@@ -10,6 +10,7 @@ import * as stock_market_pb from "./stock_market_pb";
 interface IStockPriceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     getStockPrice: IStockPriceService_IGetStockPrice;
     getStockPriceServerStreaming: IStockPriceService_IGetStockPriceServerStreaming;
+    updateStockPriceClientStreaming: IStockPriceService_IUpdateStockPriceClientStreaming;
 }
 
 interface IStockPriceService_IGetStockPrice extends grpc.MethodDefinition<stock_market_pb.StockRequest, stock_market_pb.StockResponse> {
@@ -30,12 +31,22 @@ interface IStockPriceService_IGetStockPriceServerStreaming extends grpc.MethodDe
     responseSerialize: grpc.serialize<stock_market_pb.StockResponse>;
     responseDeserialize: grpc.deserialize<stock_market_pb.StockResponse>;
 }
+interface IStockPriceService_IUpdateStockPriceClientStreaming extends grpc.MethodDefinition<stock_market_pb.UpdateStockPriceRequest, stock_market_pb.UpdateStockPriceResponse> {
+    path: "/stock_market.StockPrice/UpdateStockPriceClientStreaming";
+    requestStream: true;
+    responseStream: false;
+    requestSerialize: grpc.serialize<stock_market_pb.UpdateStockPriceRequest>;
+    requestDeserialize: grpc.deserialize<stock_market_pb.UpdateStockPriceRequest>;
+    responseSerialize: grpc.serialize<stock_market_pb.UpdateStockPriceResponse>;
+    responseDeserialize: grpc.deserialize<stock_market_pb.UpdateStockPriceResponse>;
+}
 
 export const StockPriceService: IStockPriceService;
 
 export interface IStockPriceServer extends grpc.UntypedServiceImplementation {
     getStockPrice: grpc.handleUnaryCall<stock_market_pb.StockRequest, stock_market_pb.StockResponse>;
     getStockPriceServerStreaming: grpc.handleServerStreamingCall<stock_market_pb.StockRequest, stock_market_pb.StockResponse>;
+    updateStockPriceClientStreaming: grpc.handleClientStreamingCall<stock_market_pb.UpdateStockPriceRequest, stock_market_pb.UpdateStockPriceResponse>;
 }
 
 export interface IStockPriceClient {
@@ -44,6 +55,10 @@ export interface IStockPriceClient {
     getStockPrice(request: stock_market_pb.StockRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.StockResponse) => void): grpc.ClientUnaryCall;
     getStockPriceServerStreaming(request: stock_market_pb.StockRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<stock_market_pb.StockResponse>;
     getStockPriceServerStreaming(request: stock_market_pb.StockRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<stock_market_pb.StockResponse>;
+    updateStockPriceClientStreaming(callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    updateStockPriceClientStreaming(metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    updateStockPriceClientStreaming(options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    updateStockPriceClientStreaming(metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
 }
 
 export class StockPriceClient extends grpc.Client implements IStockPriceClient {
@@ -53,4 +68,8 @@ export class StockPriceClient extends grpc.Client implements IStockPriceClient {
     public getStockPrice(request: stock_market_pb.StockRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.StockResponse) => void): grpc.ClientUnaryCall;
     public getStockPriceServerStreaming(request: stock_market_pb.StockRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<stock_market_pb.StockResponse>;
     public getStockPriceServerStreaming(request: stock_market_pb.StockRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<stock_market_pb.StockResponse>;
+    public updateStockPriceClientStreaming(callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    public updateStockPriceClientStreaming(metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    public updateStockPriceClientStreaming(options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
+    public updateStockPriceClientStreaming(metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: stock_market_pb.UpdateStockPriceResponse) => void): grpc.ClientWritableStream<stock_market_pb.UpdateStockPriceRequest>;
 }

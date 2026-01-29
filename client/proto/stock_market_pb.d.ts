@@ -69,3 +69,46 @@ export namespace StockResponse {
     }
 
 }
+
+export class UpdateStockPriceRequest extends jspb.Message { 
+    getSymbol(): string;
+    setSymbol(value: string): UpdateStockPriceRequest;
+    getPrice(): number;
+    setPrice(value: number): UpdateStockPriceRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UpdateStockPriceRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: UpdateStockPriceRequest): UpdateStockPriceRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UpdateStockPriceRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UpdateStockPriceRequest;
+    static deserializeBinaryFromReader(message: UpdateStockPriceRequest, reader: jspb.BinaryReader): UpdateStockPriceRequest;
+}
+
+export namespace UpdateStockPriceRequest {
+    export type AsObject = {
+        symbol: string,
+        price: number,
+    }
+}
+
+export class UpdateStockPriceResponse extends jspb.Message { 
+    getMessage(): string;
+    setMessage(value: string): UpdateStockPriceResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UpdateStockPriceResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: UpdateStockPriceResponse): UpdateStockPriceResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UpdateStockPriceResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UpdateStockPriceResponse;
+    static deserializeBinaryFromReader(message: UpdateStockPriceResponse, reader: jspb.BinaryReader): UpdateStockPriceResponse;
+}
+
+export namespace UpdateStockPriceResponse {
+    export type AsObject = {
+        message: string,
+    }
+}
