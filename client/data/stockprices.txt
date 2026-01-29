@@ -1,0 +1,4 @@
+{ "symbol": "PETR4", "price": 90 }
+{ "symbol": "PETR3", "price": 100 }
+{ "symbol": "TEST3", "price": 150 }
+{ "symbol": "FORM1", "price": 300 }
