@@ -136,3 +136,37 @@ func (s *Server) UpdateStockPriceClientStreaming(stream pb.StockPrice_UpdateStoc
 		Message: "Preços de ações atualizados",
 	})
 }
+
+func (s *Server) GetStockPriceBidirectionalStreaming(stream pb.StockPrice_GetStockPriceBidirectionalStreamingServer) error {
+	ctx := stream.Context()
+
+	for ctx.Err() == nil {
+		request, err := stream.Recv()
+
+		if err == io.EOF {
+			log.Printf("Cliente finalizou a conexão %v \n", ctx.Err())
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		price := RandomFloat64Between(50.0, 300.0)
+
+		log.Printf("Consulta de preço de ação para %s: {R$ %.2f} \n", request.Symbol, price)
+		stream.Send(
+			&pb.StockResponse{
+				Symbol: request.Symbol,
+				Price:  price,
+				Time: &pb.StockResponse_Timestamp{
+					Timestamp: time.Now().UnixMilli(),
+				},
+			},
+		)
+	}
+
+	log.Printf("Cliente desconectado: %v \n", ctx.Err())
+
+	return ctx.Err()
+}
