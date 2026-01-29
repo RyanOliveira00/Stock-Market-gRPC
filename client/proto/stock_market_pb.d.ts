@@ -31,8 +31,18 @@ export class StockResponse extends jspb.Message {
     setSymbol(value: string): StockResponse;
     getPrice(): number;
     setPrice(value: number): StockResponse;
+
+    hasTimestamp(): boolean;
+    clearTimestamp(): void;
     getTimestamp(): number;
     setTimestamp(value: number): StockResponse;
+
+    hasDatetime(): boolean;
+    clearDatetime(): void;
+    getDatetime(): string;
+    setDatetime(value: string): StockResponse;
+
+    getTimeCase(): StockResponse.TimeCase;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): StockResponse.AsObject;
@@ -49,5 +59,13 @@ export namespace StockResponse {
         symbol: string,
         price: number,
         timestamp: number,
+        datetime: string,
     }
+
+    export enum TimeCase {
+        TIME_NOT_SET = 0,
+        TIMESTAMP = 3,
+        DATETIME = 4,
+    }
+
 }

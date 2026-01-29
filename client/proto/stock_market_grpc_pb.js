@@ -39,6 +39,17 @@ var StockPriceService = exports.StockPriceService = {
     responseSerialize: serialize_stock_market_StockResponse,
     responseDeserialize: deserialize_stock_market_StockResponse,
   },
+  getStockPriceServerStreaming: {
+    path: '/stock_market.StockPrice/GetStockPriceServerStreaming',
+    requestStream: false,
+    responseStream: true,
+    requestType: stock_market_pb.StockRequest,
+    responseType: stock_market_pb.StockResponse,
+    requestSerialize: serialize_stock_market_StockRequest,
+    requestDeserialize: deserialize_stock_market_StockRequest,
+    responseSerialize: serialize_stock_market_StockResponse,
+    responseDeserialize: deserialize_stock_market_StockResponse,
+  },
 };
 
 exports.StockPriceClient = grpc.makeGenericClientConstructor(StockPriceService, 'StockPrice');

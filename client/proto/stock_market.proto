@@ -7,6 +7,7 @@ option go_package = "stock-market-server/proto";
 
 service StockPrice {
   rpc GetStockPrice(StockRequest) returns (StockResponse) {}
+  rpc GetStockPriceServerStreaming(StockRequest) returns (stream StockResponse) {}
 }
 
 message StockRequest {
@@ -16,6 +17,10 @@ message StockRequest {
 message StockResponse {
   string symbol = 1;
   double price = 2;
-  int64 timestamp = 3;
+  oneof time {
+    int64 timestamp = 3;
+    string datetime = 4;
+  }  
 }
 
+ 
